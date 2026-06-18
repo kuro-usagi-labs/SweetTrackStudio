@@ -46,6 +46,9 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/ios": "^8.4.0",
     "@electron-toolkit/eslint-config": "^1.0.2",
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.19",

@@ -1,0 +1,61 @@
+name: Build iOS App (.ipa)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build Web App
+      run: npm run build:web
+
+    - name: Add iOS platform with Capacitor
+      run: |
+        npx cap add ios
+        npx cap sync
+
+    - name: Pod Install in iOS directory
+      run: |
+        cd ios/App
+        pod install
+
+    - name: Build Xcode Archive (Unsigned)
+      run: |
+        xcodebuild -workspace ios/App/App.xcworkspace \
+                   -scheme App \
+                   -sdk iphoneos \
+                   -configuration Release \
+                   clean archive \
+                   -archivePath ios/App/build/App.xcarchive \
+                   CODE_SIGNING_ALLOWED=NO \
+                   CODE_SIGNING_REQUIRED=NO
+
+    - name: Package Unsigned .ipa
+      run: |
+        mkdir -p ios/App/build/Payload
+        cp -r ios/App/build/App.xcarchive/Products/Applications/App.app ios/App/build/Payload/
+        cd ios/App/build
+        zip -r SweetTrack.ipa Payload
+
+    - name: Upload .ipa Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SweetTrack-iOS
+        path: ios/App/build/SweetTrack.ipa
+        if-no-files-found: error

@@ -1,0 +1,6 @@
+{
+  "appId": "com.sweettrack.app",
+  "appName": "SweetTrack",
+  "webDir": "dist-web",
+  "bundledWebRuntime": false
+}
