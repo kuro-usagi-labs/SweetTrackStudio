@@ -5,8 +5,10 @@ import { AuthProvider } from './components/AuthProvider'
 import { api } from './lib/api'
 import './index.css'
 
-// Inject Supabase API layer globally to replace Electron's IPC
-window.api = api;
+// Inject Supabase API layer globally to replace Electron's IPC (Only in web mode)
+if (!window.electron) {
+  window.api = api;
+}
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

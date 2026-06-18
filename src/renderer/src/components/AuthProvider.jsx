@@ -9,6 +9,14 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (window.electron) {
+      // Bypass Supabase authentication for native desktop mode (use SQLite)
+      setUser({ email: 'local@sweettrack.app', id: 'local-desktop-user', isLocal: true });
+      setSession(null);
+      setLoading(false);
+      return;
+    }
+
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);

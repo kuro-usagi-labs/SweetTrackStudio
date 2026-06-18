@@ -205,6 +205,27 @@ export default function Settings() {
                   </div>
                   <p className="text-xs text-ink-500 mt-2">All data is securely backed up and synced to your cloud account.</p>
                 </div>
+
+                {!window.electron && (
+                  <div className="pt-4 border-t border-gray-100 mt-6">
+                    <label className="block text-sm font-semibold text-ink-900 mb-2">Get Desktop Version</label>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50/50 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-sm font-bold text-ink-900">SweetTrack for Windows</span>
+                        <p className="text-xs text-ink-500">Run SweetTrack locally as a native Windows desktop app using SQLite.</p>
+                      </div>
+                      <a 
+                        href="https://github.com/kuro-usagi-labs/SweetTrackStudio/releases/latest" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="btn-primary bg-ink-900 hover:bg-ink-500 px-4 py-2 text-xs flex items-center space-x-2"
+                      >
+                        <Download size={14} className="stroke-[2.5]" />
+                        <span>Download (.exe)</span>
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

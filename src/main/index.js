@@ -7,12 +7,22 @@ import { startOAuthFlow, fetchYoutubeData, fetchYoutubeAnalytics } from './youtu
 import fs from 'fs'
 
 process.on('uncaughtException', (err) => {
-  fs.writeFileSync('d:/SweetTrackStudio/crash.log', err.stack || err.toString())
+  try {
+    const logPath = join(app.getPath('userData'), 'crash.log')
+    fs.writeFileSync(logPath, err.stack || err.toString())
+  } catch (e) {
+    console.error('Failed to write crash log:', e)
+  }
   console.error('Uncaught Exception:', err)
 })
 
 process.on('unhandledRejection', (reason) => {
-  fs.writeFileSync('d:/SweetTrackStudio/crash.log', reason?.stack || reason?.toString() || 'Unhandled Rejection')
+  try {
+    const logPath = join(app.getPath('userData'), 'crash.log')
+    fs.writeFileSync(logPath, reason?.stack || reason?.toString() || 'Unhandled Rejection')
+  } catch (e) {
+    console.error('Failed to write rejection log:', e)
+  }
   console.error('Unhandled Rejection:', reason)
 })
 

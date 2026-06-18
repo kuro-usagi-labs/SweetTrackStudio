@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { HashRouter as Router, Routes, Route, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, Lightbulb, Calendar as CalendarIcon, Target, BarChart2, Wand2, Settings as SettingsIcon, Plus, X, Upload, ChevronUp, Video, Search, Bell, Moon, Sun, Menu } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Lightbulb, Calendar as CalendarIcon, Target, BarChart2, Wand2, Settings as SettingsIcon, Plus, X, Upload, ChevronUp, Video, Search, Bell, Moon, Sun, Menu, Download } from 'lucide-react';
 import { DialogProvider, useDialog } from './components/DialogContext';
 import { useAuth } from './components/AuthProvider';
 import Login from './pages/Login';
@@ -174,6 +174,17 @@ function Sidebar({ toggleTheme, isDarkMode, config, refreshConfig }) {
         </nav>
 
         <div className="px-4 mt-auto space-y-2" style={{ WebkitAppRegion: 'no-drag' }}>
+          {!window.electron && (
+            <a 
+              href="https://github.com/kuro-usagi-labs/SweetTrackStudio/releases/latest" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="w-full flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-xl transition-colors text-ink-500 hover:text-ink-900 font-medium text-sm"
+            >
+              <Download size={18} />
+              <span>Download App</span>
+            </a>
+          )}
           <button onClick={toggleTheme} className="w-full flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-xl transition-colors text-ink-500 hover:text-ink-900 font-medium text-sm">
             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
@@ -321,6 +332,20 @@ function BottomNav({ toggleTheme, isDarkMode, config, refreshConfig }) {
                   <span>{isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
                 </div>
               </button>
+
+              {!window.electron && (
+                <a 
+                  href="https://github.com/kuro-usagi-labs/SweetTrackStudio/releases/latest" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl active:scale-95 transition-transform"
+                >
+                  <div className="flex items-center space-x-3 text-ink-900 font-bold text-sm">
+                    <Download size={20} className="stroke-[2.5]" />
+                    <span>Download Windows App</span>
+                  </div>
+                </a>
+              )}
             </div>
           </div>
         </div>
