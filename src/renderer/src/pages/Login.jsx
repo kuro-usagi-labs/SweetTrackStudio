@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Video, Mail, Lock, Loader2 } from 'lucide-react';
 import { useDialog } from '../components/DialogContext';
+import { useAuth } from '../components/AuthProvider';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,6 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { showToast } = useDialog();
+  const { bypassAuth } = useAuth();
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -78,6 +80,16 @@ export default function Login() {
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
+
+          {window.electron && (
+            <button 
+              type="button" 
+              onClick={bypassAuth}
+              className="w-full btn-secondary py-3 flex justify-center items-center mt-2 border-gray-200 text-ink-700 hover:bg-gray-50"
+            >
+              <span>Use Offline Mode (Local SQLite)</span>
+            </button>
+          )}
         </form>
 
 

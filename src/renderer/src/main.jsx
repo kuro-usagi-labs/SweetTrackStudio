@@ -5,10 +5,12 @@ import { AuthProvider } from './components/AuthProvider'
 import { api } from './lib/api'
 import './index.css'
 
-// Inject Supabase API layer globally to replace Electron's IPC (Only in web mode)
-if (!window.electron) {
-  window.api = api;
+// Keep a reference to the native Electron IPC API if it exists (for offline SQLite mode)
+if (window.api) {
+  window.nativeApi = window.api;
 }
+// Inject the unified offline-first API layer globally to handle both Supabase and SQLite
+window.api = api;
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

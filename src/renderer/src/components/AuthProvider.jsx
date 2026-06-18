@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { syncLocalToCloud } from '../lib/api';
 
 const AuthContext = createContext({});
 
@@ -8,9 +9,21 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const bypassAuth = () => {
+    localStorage.setItem('useOfflineMode', 'true');
+    setUser({ email: 'local@sweettrack.app', id: 'local-desktop-user', isLocal: true });
+    setSession(null);
+    setLoading(false);
+  };
+
+  const logoutOffline = () => {
+    localStorage.removeItem('useOfflineMode');
+    setUser(null);
+    setSession(null);
+  };
+
   useEffect(() => {
-    if (window.electron) {
-      // Bypass Supabase authentication for native desktop mode (use SQLite)
+    if (window.electron && (!navigator.onLine || localStorage.getItem('useOfflineMode') === 'true')) {
       setUser({ email: 'local@sweettrack.app', id: 'local-desktop-user', isLocal: true });
       setSession(null);
       setLoading(false);
@@ -25,17 +38,20 @@ export const AuthProvider = ({ children }) => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (event === 'SIGNED_IN') {
+        syncLocalToCloud();
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading }}>
+    <AuthContext.Provider value={{ user, session, loading, bypassAuth, logoutOffline }}>
       {children}
     </AuthContext.Provider>
   );

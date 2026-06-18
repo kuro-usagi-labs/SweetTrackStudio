@@ -1,12 +1,32 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Save, Download, Upload, Trash2, Key, Database, CheckCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Download, Upload, Trash2, Key, Database, CheckCircle, LogOut } from 'lucide-react';
 import { useDialog } from '../components/DialogContext';
+import { useAuth } from '../components/AuthProvider';
+import { supabase } from '../lib/supabase';
 
 export default function Settings() {
   const { showToast, showConfirm } = useDialog();
+  const { user, logoutOffline } = useAuth();
   const [activeTab, setActiveTab] = useState('general');
   const [isExporting, setIsExporting] = useState(false);
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+
+  const handleSignOut = async () => {
+    const confirmed = await showConfirm(
+      user?.isLocal ? 'Exit Offline Mode?' : 'Sign Out?',
+      user?.isLocal 
+        ? 'Are you sure you want to exit offline mode? This will take you back to the login screen.'
+        : 'Are you sure you want to sign out of your account?',
+      true
+    );
+    if (confirmed) {
+      if (user?.isLocal) {
+        logoutOffline();
+      } else {
+        await supabase.auth.signOut();
+      }
+    }
+  };
 
   const handleExportBackup = async () => {
     if (!window.api) return;
@@ -226,6 +246,28 @@ export default function Settings() {
                     </div>
                   </div>
                 )}
+
+                <div className="pt-6 border-t border-gray-100 mt-6">
+                  <label className="block text-sm font-semibold text-ink-900 mb-2">Account Session</label>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50/50 gap-4">
+                    <div className="space-y-0.5">
+                      <span className="text-sm font-bold text-ink-900">
+                        {user?.isLocal ? 'Offline Mode (Local SQLite)' : 'Signed In'}
+                      </span>
+                      <p className="text-xs text-ink-500">
+                        {user?.isLocal 
+                          ? 'Running locally using SQLite database. Log in to sync with cloud.' 
+                          : `Logged in as ${user?.email || 'User'}`}
+                      </p>
+                    </div>
+                    <button 
+                      onClick={handleSignOut}
+                      className="btn-secondary text-xs font-bold text-red-500 hover:text-white hover:bg-red-500 border-red-200 hover:border-transparent px-4 py-2 rounded-xl transition-colors"
+                    >
+                      {user?.isLocal ? 'Exit Offline Mode' : 'Sign Out'}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
