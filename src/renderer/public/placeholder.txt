@@ -1,0 +1,2 @@
+Place your built SweetTrack-Setup.exe installer in this folder and rename it to 'SweetTrack-Setup.exe'.
+When you push to Git, Vercel will host this file as a static asset, allowing users to download it directly from your website domain.

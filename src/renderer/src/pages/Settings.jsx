@@ -234,13 +234,14 @@ export default function Settings() {
                         <span className="text-sm font-bold text-ink-900">SweetTrack for Windows</span>
                         <p className="text-xs text-ink-500">Run SweetTrack locally as a native Windows desktop app using SQLite.</p>
                       </div>
-                      <button 
-                        onClick={(e) => { e.preventDefault(); window.api.downloadLatestInstaller(); }}
+                      <a 
+                        href="/SweetTrack-Setup.exe" 
+                        download="SweetTrack-Setup.exe"
                         className="btn-primary bg-ink-900 hover:bg-ink-500 px-4 py-2 text-xs flex items-center space-x-2"
                       >
                         <Download size={14} className="stroke-[2.5]" />
                         <span>Download (.exe)</span>
-                      </button>
+                      </a>
                     </div>
                   </div>
                 )}
