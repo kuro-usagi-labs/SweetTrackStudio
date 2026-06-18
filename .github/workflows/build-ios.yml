@@ -30,10 +30,6 @@ jobs:
         npx cap add ios
         npx cap sync
 
-    - name: Pod Install in iOS directory
-      run: |
-        cd ios/App
-        pod install
 
     - name: Build Xcode Archive (Unsigned)
       run: |
