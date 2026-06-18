@@ -234,15 +234,13 @@ export default function Settings() {
                         <span className="text-sm font-bold text-ink-900">SweetTrack for Windows</span>
                         <p className="text-xs text-ink-500">Run SweetTrack locally as a native Windows desktop app using SQLite.</p>
                       </div>
-                      <a 
-                        href="https://github.com/kuro-usagi-labs/SweetTrackStudio/releases/latest" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
+                      <button 
+                        onClick={(e) => { e.preventDefault(); window.api.downloadLatestInstaller(); }}
                         className="btn-primary bg-ink-900 hover:bg-ink-500 px-4 py-2 text-xs flex items-center space-x-2"
                       >
                         <Download size={14} className="stroke-[2.5]" />
                         <span>Download (.exe)</span>
-                      </a>
+                      </button>
                     </div>
                   </div>
                 )}

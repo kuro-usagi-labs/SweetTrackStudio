@@ -129,6 +129,23 @@ export const pullCloudToLocal = async () => {
   }
 };
 
+export const downloadLatestInstaller = async () => {
+  try {
+    const response = await fetch('https://api.github.com/repos/kuro-usagi-labs/SweetTrackStudio/releases/latest');
+    if (!response.ok) throw new Error("No release found or API limit reached");
+    const release = await response.json();
+    const exeAsset = release.assets?.find(asset => asset.name.endsWith('.exe'));
+    if (exeAsset?.browser_download_url) {
+      window.location.href = exeAsset.browser_download_url;
+    } else {
+      window.open('https://github.com/kuro-usagi-labs/SweetTrackStudio/releases', '_blank');
+    }
+  } catch (err) {
+    console.warn("Failed to fetch latest installer directly, redirecting to releases page:", err);
+    window.open('https://github.com/kuro-usagi-labs/SweetTrackStudio/releases', '_blank');
+  }
+};
+
 // Setup online listener to trigger auto-sync
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
@@ -141,6 +158,7 @@ if (typeof window !== 'undefined') {
 }
 
 export const api = {
+  downloadLatestInstaller: downloadLatestInstaller,
   getProfiles: async () => {
     if (await isCloudMode()) {
       const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: true });

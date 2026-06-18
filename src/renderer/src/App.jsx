@@ -175,15 +175,13 @@ function Sidebar({ toggleTheme, isDarkMode, config, refreshConfig }) {
 
         <div className="px-4 mt-auto space-y-2" style={{ WebkitAppRegion: 'no-drag' }}>
           {!window.electron && (
-            <a 
-              href="https://github.com/kuro-usagi-labs/SweetTrackStudio/releases/latest" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <button 
+              onClick={(e) => { e.preventDefault(); window.api.downloadLatestInstaller(); }}
               className="w-full flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-xl transition-colors text-ink-500 hover:text-ink-900 font-medium text-sm"
             >
               <Download size={18} />
               <span>Download App</span>
-            </a>
+            </button>
           )}
           <button onClick={toggleTheme} className="w-full flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-xl transition-colors text-ink-500 hover:text-ink-900 font-medium text-sm">
             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -334,17 +332,15 @@ function BottomNav({ toggleTheme, isDarkMode, config, refreshConfig }) {
               </button>
 
               {!window.electron && (
-                <a 
-                  href="https://github.com/kuro-usagi-labs/SweetTrackStudio/releases/latest" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <button 
+                  onClick={(e) => { e.preventDefault(); window.api.downloadLatestInstaller(); }}
                   className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl active:scale-95 transition-transform"
                 >
                   <div className="flex items-center space-x-3 text-ink-900 font-bold text-sm">
                     <Download size={20} className="stroke-[2.5]" />
                     <span>Download Windows App</span>
                   </div>
-                </a>
+                </button>
               )}
             </div>
           </div>
