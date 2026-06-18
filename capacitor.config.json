@@ -2,5 +2,10 @@
   "appId": "com.sweettrack.app",
   "appName": "SweetTrack",
   "webDir": "dist-web",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "server": {
+    "iosScheme": "https",
+    "androidScheme": "https"
+  }
 }
+

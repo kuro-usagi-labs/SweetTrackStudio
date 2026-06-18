@@ -181,7 +181,7 @@ function Sidebar({ toggleTheme, isDarkMode, config, refreshConfig }) {
         </nav>
 
         <div className="px-4 mt-auto space-y-2" style={{ WebkitAppRegion: 'no-drag' }}>
-          {!window.electron && (
+          {!window.electron && !window.Capacitor && (
             <a 
               href="/SweetTrack-Setup.exe" 
               download="SweetTrack-Setup.exe"
@@ -339,7 +339,7 @@ function BottomNav({ toggleTheme, isDarkMode, config, refreshConfig }) {
                 </div>
               </button>
 
-              {!window.electron && (
+              {!window.electron && !window.Capacitor && (
                 <a 
                   href="/SweetTrack-Setup.exe" 
                   download="SweetTrack-Setup.exe"

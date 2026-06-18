@@ -226,7 +226,7 @@ export default function Settings() {
                   <p className="text-xs text-ink-500 mt-2">All data is securely backed up and synced to your cloud account.</p>
                 </div>
 
-                {!window.electron && (
+                {!window.electron && !window.Capacitor && (
                   <div className="pt-4 border-t border-gray-100 mt-6">
                     <label className="block text-sm font-semibold text-ink-900 mb-2">Get Desktop Version</label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50/50 gap-4">
