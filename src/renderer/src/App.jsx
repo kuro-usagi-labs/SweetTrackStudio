@@ -284,7 +284,7 @@ function BottomNav({ toggleTheme, isDarkMode, config, refreshConfig }) {
               key={item.path} 
               to={item.path}
               onClick={() => setIsMoreOpen(false)}
-              className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full space-y-1.5 transition-all duration-300 ${isActive ? 'text-ink-900' : 'text-ink-400 hover:text-ink-600'}`}
+              className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-full space-y-1.5 transition-all duration-300 ${isActive ? 'text-ink-900' : 'text-ink-400 hover:text-ink-600'}`}
             >
               {({ isActive }) => (
                 <>
@@ -298,7 +298,7 @@ function BottomNav({ toggleTheme, isDarkMode, config, refreshConfig }) {
           ))}
           <button 
             onClick={() => setIsMoreOpen(!isMoreOpen)}
-            className={`flex flex-col items-center justify-center w-16 h-full space-y-1.5 transition-all duration-300 ${isMoreOpen ? 'text-ink-900' : 'text-ink-400 hover:text-ink-600'}`}
+            className={`relative flex flex-col items-center justify-center w-16 h-full space-y-1.5 transition-all duration-300 ${isMoreOpen ? 'text-ink-900' : 'text-ink-400 hover:text-ink-600'}`}
           >
              <div className={`transition-transform duration-300 ${isMoreOpen ? 'scale-110 -translate-y-1' : 'scale-100'}`}>
                <Menu size={24} className={isMoreOpen ? 'stroke-[2.5]' : 'stroke-[2]'} />
@@ -365,7 +365,7 @@ function Topbar({ searchQuery, setSearchQuery }) {
   const { user } = useAuth();
   
   return (
-    <div className="h-16 md:h-20 bg-white/85 dark:bg-[#272625]/85 glass-nav flex items-center justify-between px-4 md:px-8 border-b md:border-b-0 border-gray-200 md:bg-surface sticky top-0 z-30" style={{ WebkitAppRegion: 'drag' }}>
+    <div className="min-h-16 md:min-h-20 py-2 bg-white/85 dark:bg-[#272625]/85 glass-nav flex items-center justify-between px-4 md:px-8 border-b md:border-b-0 border-gray-200 md:bg-surface sticky top-0 z-30" style={{ WebkitAppRegion: 'drag', paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}>
       {/* Mobile Logo Presentation */}
       <div className="flex items-center space-x-3 md:hidden w-full" style={{ WebkitAppRegion: 'no-drag' }}>
         <div className="w-9 h-9 rounded-xl bg-ink-900 text-white flex items-center justify-center shadow-md">
@@ -516,7 +516,7 @@ export default function App() {
                   setSearchQuery={setSearchQuery}
                 />
 
-                <main key={refreshKey} className="flex-1 overflow-hidden bg-gray-50 md:rounded-tl-[2rem] md:border-l md:border-t border-gray-200 relative pb-[5.5rem] md:pb-0" style={{ WebkitAppRegion: 'no-drag' }}>
+                <main key={refreshKey} className="flex-1 overflow-hidden bg-gray-50 md:rounded-tl-[2rem] md:border-l md:border-t border-gray-200 relative pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0" style={{ WebkitAppRegion: 'no-drag' }}>
                   <div className="h-full overflow-y-auto custom-scrollbar p-4 md:p-8 lg:px-12 lg:py-10">
                     <div className="mx-auto max-w-7xl h-full pb-safe">
                       <Routes>

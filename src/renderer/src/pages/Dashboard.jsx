@@ -179,12 +179,21 @@ export default function Dashboard() {
             
             <div className="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-2">
               {focusData.items.map((item) => (
-                <div key={item.id} className="flex items-center group">
-                  <button onClick={() => toggleFocusItem(item.id)} className="w-5 h-5 shrink-0 rounded border border-gray-500 flex items-center justify-center mr-3 hover:border-gray-300 transition-colors">
-                    {item.done && <div className="w-3 h-3 bg-gray-300 rounded-sm"></div>}
+                <div 
+                  key={item.id} 
+                  className="flex items-center group py-1 bg-white/5 hover:bg-white/10 px-3 rounded-xl transition-all active:scale-[0.99] cursor-pointer mb-2"
+                  onClick={() => toggleFocusItem(item.id)}
+                >
+                  <div className="w-5.5 h-5.5 shrink-0 rounded-lg border border-gray-500 flex items-center justify-center mr-3 hover:border-gray-300 transition-colors">
+                    {item.done && <div className="w-3.5 h-3.5 bg-gray-300 rounded-[3px]"></div>}
+                  </div>
+                  <span className={`text-sm flex-1 py-1.5 ${item.done ? 'text-gray-500 line-through' : 'text-gray-300'}`}>{item.text}</span>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); deleteFocusItem(item.id); }} 
+                    className="text-gray-500 hover:text-red-400 p-1.5 text-lg font-bold opacity-80 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
                   </button>
-                  <span className={`text-sm flex-1 ${item.done ? 'text-gray-500 line-through' : 'text-gray-300'}`}>{item.text}</span>
-                  <button onClick={() => deleteFocusItem(item.id)} className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">×</button>
                 </div>
               ))}
               
