@@ -33,14 +33,27 @@ jobs:
 
     - name: Build Xcode Archive (Unsigned)
       run: |
-        xcodebuild -workspace ios/App/App.xcworkspace \
-                   -scheme App \
-                   -sdk iphoneos \
-                   -configuration Release \
-                   clean archive \
-                   -archivePath ios/App/build/App.xcarchive \
-                   CODE_SIGNING_ALLOWED=NO \
-                   CODE_SIGNING_REQUIRED=NO
+        if [ -d "ios/App/App.xcworkspace" ]; then
+          echo "Xcode Workspace found. Building using Workspace..."
+          xcodebuild -workspace ios/App/App.xcworkspace \
+                     -scheme App \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     clean archive \
+                     -archivePath ios/App/build/App.xcarchive \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO
+        else
+          echo "Xcode Workspace NOT found. Building using Project (SPM mode)..."
+          xcodebuild -project ios/App/App.xcodeproj \
+                     -scheme App \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     clean archive \
+                     -archivePath ios/App/build/App.xcarchive \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO
+        fi
 
     - name: Package Unsigned .ipa
       run: |
