@@ -30,6 +30,7 @@
     "build:linux": "npm run build && electron-builder --linux --config"
   },
   "dependencies": {
+    "@capacitor/local-notifications": "^8.2.0",
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "@hello-pangea/dnd": "^18.0.1",

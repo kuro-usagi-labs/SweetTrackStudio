@@ -409,27 +409,37 @@ export const api = {
     }
   },
   addReminder: async (data) => {
+    let result;
     if (await isCloudMode()) {
       const userId = await getUserId();
       const { data: res, error } = await supabase.from('reminders').insert([{ ...data, user_id: userId }]).select();
       if (error) throw error;
       schedulePull();
-      return res[0];
+      result = res[0];
     } else {
       markForSync();
-      return await window.nativeApi.addReminder(data);
+      result = await window.nativeApi.addReminder(data);
     }
+    if (window.Capacitor) {
+      setTimeout(() => api.syncRemindersToNativeLocal(), 100);
+    }
+    return result;
   },
   deleteReminder: async (id) => {
+    let result;
     if (await isCloudMode()) {
       const { error } = await supabase.from('reminders').delete().eq('id', id);
       if (error) throw error;
       schedulePull();
-      return { success: true };
+      result = { success: true };
     } else {
       markForSync();
-      return await window.nativeApi.deleteReminder(id);
+      result = await window.nativeApi.deleteReminder(id);
     }
+    if (window.Capacitor) {
+      setTimeout(() => api.syncRemindersToNativeLocal(), 100);
+    }
+    return result;
   },
 
   getScratchpad: async () => {
@@ -622,6 +632,27 @@ export const api = {
       window.nativeApi.sendNotification(title, body);
       return;
     }
+    if (window.Capacitor) {
+      import('@capacitor/local-notifications').then(({ LocalNotifications }) => {
+        LocalNotifications.requestPermissions().then((status) => {
+          if (status.display === 'granted') {
+            LocalNotifications.schedule({
+              notifications: [
+                {
+                  title: title,
+                  body: body,
+                  id: Math.floor(Math.random() * 1000000),
+                  schedule: { at: new Date(Date.now() + 100) }
+                }
+              ]
+            });
+          }
+        });
+      }).catch(err => {
+        console.error("LocalNotifications error:", err);
+      });
+      return;
+    }
     if ("Notification" in window) {
       if (Notification.permission === "granted") {
         new Notification(title, { body });
@@ -632,6 +663,47 @@ export const api = {
           }
         });
       }
+    }
+  },
+
+  syncRemindersToNativeLocal: async () => {
+    if (!window.Capacitor) return;
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      const status = await LocalNotifications.requestPermissions();
+      if (status.display !== 'granted') return;
+
+      const reminders = await api.getReminders();
+      const now = new Date();
+
+      const pending = await LocalNotifications.getPending();
+      if (pending.notifications && pending.notifications.length > 0) {
+        await LocalNotifications.cancel({ notifications: pending.notifications });
+      }
+
+      const notificationsToSchedule = [];
+      reminders.forEach((r) => {
+        if (r.due_time && !r.is_completed) {
+          const due = new Date(r.due_time);
+          if (due > now) {
+            const id = typeof r.id === 'number' ? r.id : hashStringToInt(String(r.id));
+            notificationsToSchedule.push({
+              id: id || Math.floor(Math.random() * 1000000),
+              title: 'SweetTrack Reminder',
+              body: r.title,
+              schedule: { at: due }
+            });
+          }
+        }
+      });
+
+      if (notificationsToSchedule.length > 0) {
+        await LocalNotifications.schedule({
+          notifications: notificationsToSchedule
+        });
+      }
+    } catch (err) {
+      console.error("Failed to sync reminders to native local notifications:", err);
     }
   },
 
@@ -722,3 +794,13 @@ export const api = {
     return { error: 'Sync requires backend access to save videos directly' };
   }
 };
+
+function hashStringToInt(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}

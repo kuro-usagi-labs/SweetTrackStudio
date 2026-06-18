@@ -447,6 +447,12 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (user && window.api && window.api.syncRemindersToNativeLocal) {
+      window.api.syncRemindersToNativeLocal();
+    }
+  }, [user, refreshKey]);
+
+  useEffect(() => {
     loadConfig();
   }, [refreshKey]);
 
