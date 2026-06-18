@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, NavLink, useLocation } from 'react
 import { LayoutDashboard, ListTodo, Lightbulb, Calendar as CalendarIcon, Target, BarChart2, Wand2, Settings as SettingsIcon, Plus, X, Upload, ChevronUp, Video, Search, Bell, Moon, Sun, Menu, Download } from 'lucide-react';
 import { DialogProvider, useDialog } from './components/DialogContext';
 import { useAuth } from './components/AuthProvider';
+import { syncLocalToCloud } from './lib/api';
 import Login from './pages/Login';
 import { Loader2 } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
@@ -97,6 +98,7 @@ function ProfileModal({ isOpen, onClose, initialData, isEdit, onDelete, preventC
 
 function Sidebar({ toggleTheme, isDarkMode, config, refreshConfig }) {
   const { showToast, showConfirm } = useDialog();
+  const { user } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [modalState, setModalState] = useState({ isOpen: false, isEdit: false, data: null, preventClose: false });
 
@@ -152,7 +154,12 @@ function Sidebar({ toggleTheme, isDarkMode, config, refreshConfig }) {
             <div className="w-8 h-8 rounded-lg bg-ink-900 text-white flex items-center justify-center shadow-sm" style={{ WebkitAppRegion: 'no-drag' }}>
               <Video size={18} className="stroke-[2.5]" />
             </div>
-            <h1 className="text-xl font-extrabold text-ink-900 tracking-tight">SweetTrack</h1>
+            <div className="text-left" style={{ WebkitAppRegion: 'no-drag' }}>
+              <h1 className="text-xl font-extrabold text-ink-900 tracking-tight leading-tight">SweetTrack</h1>
+              {user?.isLocal && (
+                <span className="text-[9px] font-extrabold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 inline-block mt-0.5">Offline Mode</span>
+              )}
+            </div>
           </div>
         </div>
         
@@ -355,6 +362,7 @@ function BottomNav({ toggleTheme, isDarkMode, config, refreshConfig }) {
 function Topbar({ searchQuery, setSearchQuery }) {
   const location = useLocation();
   const showSearch = location.pathname === '/pipeline' || location.pathname === '/ideas';
+  const { user } = useAuth();
   
   return (
     <div className="h-16 md:h-20 bg-white/85 dark:bg-[#272625]/85 glass-nav flex items-center justify-between px-4 md:px-8 border-b md:border-b-0 border-gray-200 md:bg-surface sticky top-0 z-30" style={{ WebkitAppRegion: 'drag' }}>
@@ -363,7 +371,12 @@ function Topbar({ searchQuery, setSearchQuery }) {
         <div className="w-9 h-9 rounded-xl bg-ink-900 text-white flex items-center justify-center shadow-md">
           <Video size={20} className="stroke-[2.5]" />
         </div>
-        <h1 className="text-xl font-extrabold text-ink-900 tracking-tight">SweetTrack</h1>
+        <div className="text-left">
+          <h1 className="text-xl font-extrabold text-ink-900 tracking-tight leading-tight">SweetTrack</h1>
+          {user?.isLocal && (
+            <span className="text-[9px] font-extrabold text-amber-600 bg-amber-50 px-1 py-0.5 rounded border border-amber-200 inline-block">Offline</span>
+          )}
+        </div>
         <div className="flex-1"></div>
         {/* Mobile Notification Bell */}
         <button className="relative p-2.5 text-ink-500 hover:text-ink-900 bg-gray-50 rounded-xl shadow-sm transition-colors">
@@ -397,6 +410,26 @@ function Topbar({ searchQuery, setSearchQuery }) {
       </div>
     </div>
   );
+}
+
+function SyncManager() {
+  const { showToast } = useDialog();
+  const { setRefreshKey } = useContext(GlobalContext);
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      if (localStorage.getItem('needsOfflineSync') === 'true') {
+        showToast("Connection restored. Syncing changes to cloud...", "info");
+        await syncLocalToCloud();
+        showToast("Offline data successfully synced to cloud!", "success");
+        setRefreshKey(k => k + 1);
+      }
+    };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [showToast, setRefreshKey]);
+
+  return null;
 }
 
 export default function App() {
@@ -470,6 +503,7 @@ export default function App() {
             <Login />
           ) : (
             <div className="flex h-screen bg-surface overflow-hidden">
+              <SyncManager />
               <Sidebar 
                 toggleTheme={toggleTheme} 
                 isDarkMode={isDarkMode} 
