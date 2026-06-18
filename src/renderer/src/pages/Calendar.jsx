@@ -259,7 +259,7 @@ export default function Calendar() {
                     <h4 className="text-sm font-bold text-ink-900 dark:text-white leading-tight pr-6">{r.title}</h4>
                     <button 
                       onClick={() => deleteReminder(r.id)}
-                      className="absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 md:opacity-0 md:group-hover:opacity-100 transition-all"
                     >
                       <X size={14} />
                     </button>

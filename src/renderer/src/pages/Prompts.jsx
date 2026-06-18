@@ -109,7 +109,7 @@ export default function Prompts() {
               <div className="flex items-center space-x-2">
                 <button 
                   onClick={() => handleDelete(prompt.id)}
-                  className="text-ink-300 hover:text-red-500 p-1 transition-colors opacity-0 group-hover:opacity-100"
+                  className="text-ink-300 hover:text-red-500 p-1 transition-colors md:opacity-0 md:group-hover:opacity-100"
                   title="Delete"
                 >
                   <Trash2 size={16} />

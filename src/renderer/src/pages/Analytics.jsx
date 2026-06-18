@@ -130,13 +130,59 @@ export default function Analytics() {
       </div>
 
       {/* History Panel */}
-      <div className="card bg-surface flex flex-col">
+      <div className="card border-0 md:border flex flex-col bg-transparent md:bg-surface relative overflow-hidden">
          <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
             <h2 className="text-sm font-bold text-ink-900 uppercase tracking-wider flex items-center">
               <History size={16} className="mr-2 text-ink-500" /> Analysis History
             </h2>
          </div>
-         <div className="overflow-x-auto">
+         {/* Mobile View: History Cards */}
+         <div className="md:hidden divide-y divide-gray-100 bg-surface dark:divide-gray-800">
+           {history.length === 0 ? (
+             <div className="py-12 text-center text-ink-500 text-sm">
+               No videos analyzed yet. Fill in the metrics form above to start.
+             </div>
+           ) : (
+             history.map(h => (
+               <div key={h.id} className="p-5 flex flex-col space-y-3">
+                 <div className="flex justify-between items-start">
+                   <div className="space-y-0.5 text-left">
+                     <h3 className="font-bold text-sm text-ink-900 dark:text-white leading-snug">{h.video_title}</h3>
+                     <span className="text-[10px] text-ink-400 font-bold">
+                       {format(new Date(h.date_added), 'MMM d, yyyy')}
+                     </span>
+                   </div>
+                 </div>
+
+                 <div className="grid grid-cols-4 gap-2 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border border-gray-100 dark:border-gray-800 text-center">
+                   <div>
+                     <div className="text-[9px] font-bold text-ink-400 uppercase tracking-wide">Views</div>
+                     <div className="text-xs font-bold text-ink-900 dark:text-white mt-0.5">{h.views?.toLocaleString() || '0'}</div>
+                   </div>
+                   <div>
+                     <div className="text-[9px] font-bold text-ink-400 uppercase tracking-wide">CTR</div>
+                     <div className="text-xs font-bold text-ink-900 dark:text-white mt-0.5">
+                       {h.ctr === 0 || h.ctr === null ? 'N/A' : `${h.ctr}%`}
+                     </div>
+                   </div>
+                   <div>
+                     <div className="text-[9px] font-bold text-ink-400 uppercase tracking-wide">30s Ret.</div>
+                     <div className="text-xs font-bold text-ink-900 dark:text-white mt-0.5">
+                       {h.retention_30s === 0 || h.retention_30s === null ? 'N/A' : `${h.retention_30s}%`}
+                     </div>
+                   </div>
+                   <div>
+                     <div className="text-[9px] font-bold text-ink-400 uppercase tracking-wide">AVD</div>
+                     <div className="text-xs font-bold text-ink-900 dark:text-white mt-0.5">{h.avg_view_duration}m</div>
+                   </div>
+                 </div>
+               </div>
+             ))
+           )}
+         </div>
+
+         {/* Desktop View: Table Layout */}
+         <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead className="bg-surface sticky top-0 z-10 border-b border-gray-200 shadow-sm">
                 <tr>

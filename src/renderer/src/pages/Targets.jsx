@@ -117,7 +117,7 @@ export default function Targets() {
         </button>
       </div>
 
-      <div className="card p-8 md:p-10 relative bg-surface">
+      <div className="card p-4 md:p-10 relative bg-transparent md:bg-surface border-0 md:border">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {targets.map(target => {
             const isCompleted = target.is_completed === 1;

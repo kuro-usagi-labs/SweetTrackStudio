@@ -16,7 +16,6 @@ export default function IdeaBank() {
   const loadIdeas = () => {
     if (window.api) {
       window.api.getIdeas().then(data => {
-        // Map the DB fields to the format used in UI
         const formatted = data.map(d => ({
            id: d.id,
            title: d.title,
@@ -74,6 +73,15 @@ export default function IdeaBank() {
     }
   };
 
+  // Filter ideas based on selected category and global search query
+  const filteredIdeas = ideas.filter(idea => {
+    const matchesPillar = filterPillar === 'All Pillars' || idea.pillar === filterPillar;
+    const matchesSearch = !searchQuery || 
+      idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      idea.cluster.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesPillar && matchesSearch;
+  });
+
   return (
     <div className="max-w-[1200px] mx-auto flex flex-col pb-10 relative">
       <div className="flex justify-between items-end mb-8 px-2">
@@ -86,7 +94,7 @@ export default function IdeaBank() {
         </button>
       </div>
 
-      <div className="card flex flex-col relative overflow-hidden">
+      <div className="card border-0 md:border flex flex-col relative overflow-hidden bg-transparent md:bg-surface">
         {/* Add Modal Overlay */}
         {isAdding && (
           <div className="fixed inset-0 bg-ink-900/50 backdrop-blur-[2px] z-[100] flex items-center justify-center p-4">
@@ -138,24 +146,66 @@ export default function IdeaBank() {
           </div>
         )}
 
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 dark:border-gray-800">
           <div className="relative w-72">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-300" size={16} />
-            <select value={filterPillar} onChange={(e) => setFilterPillar(e.target.value)} className="input-field bg-surface text-sm">
-  <option value="All Pillars">All Pillars</option>
-  <option value="Evergreen">Evergreen</option>
-  <option value="Trending">Trending</option>
-  <option value="Vlog">Vlog</option>
-</select>
+            <select value={filterPillar} onChange={(e) => setFilterPillar(e.target.value)} className="input-field bg-surface text-sm pl-9">
+              <option value="All Pillars">All Pillars</option>
+              <option value="Actionable Advice">Actionable Advice</option>
+              <option value="Education">Education</option>
+              <option value="Opinion/Story">Opinion/Story</option>
+              <option value="Trend Jacking">Trend Jacking</option>
+            </select>
           </div>
           <button className="btn-secondary flex items-center space-x-2">
             <Filter size={16} /><span>Filters</span>
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile View: Cards Layout */}
+        <div className="md:hidden divide-y divide-gray-100 bg-surface dark:divide-gray-800">
+          {filteredIdeas.length === 0 ? (
+            <div className="py-12 text-center text-ink-500 text-sm">
+              No ideas saved yet. Click "Add Idea" to start brainstorming.
+            </div>
+          ) : (
+            filteredIdeas.map(idea => (
+              <div key={idea.id} className="p-5 flex flex-col space-y-4">
+                <div className="flex justify-between items-start space-x-3">
+                  <div className="space-y-1.5 flex-1 text-left">
+                    <h3 className="font-bold text-sm text-ink-900 dark:text-white leading-snug">{idea.title}</h3>
+                    <div className="flex flex-wrap gap-1.5 pt-1 items-center">
+                      <span className="bg-gray-100 dark:bg-gray-800 text-ink-700 dark:text-gray-300 px-2.5 py-0.5 rounded text-[10px] font-semibold tracking-wide">
+                        {idea.cluster}
+                      </span>
+                      <span className="text-[10px] text-ink-400 font-bold">
+                        • {idea.pillar}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="shrink-0 flex flex-col items-center justify-center w-11 h-11 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-ink-900 dark:text-white font-bold text-sm shadow-sm">
+                    <span className="text-[8px] text-ink-400 uppercase font-extrabold tracking-wider leading-none mb-0.5">Score</span>
+                    <span className="leading-none">{idea.total_score}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-end space-x-2 pt-1">
+                  <button onClick={() => moveToPipeline(idea)} className="btn-primary text-xs font-bold px-4 py-2.5 flex-1 shadow-sm">
+                    Push to Pipeline
+                  </button>
+                  <button onClick={() => handleDelete(idea.id)} className="text-ink-400 hover:text-red-500 p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-red-50 hover:border-red-100 transition-colors">
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View: Table Layout */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-surface sticky top-0 z-10 border-b border-gray-200 shadow-sm">
+            <thead className="bg-surface sticky top-0 z-10 border-b border-gray-200 shadow-sm dark:border-gray-800">
               <tr>
                 <th className="py-4 px-6 text-[11px] font-bold text-ink-500 uppercase tracking-wider">Video Title</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-ink-500 uppercase tracking-wider">Category</th>
@@ -163,24 +213,24 @@ export default function IdeaBank() {
                 <th className="py-4 px-6 text-[11px] font-bold text-ink-500 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 bg-surface">
-              {ideas.length === 0 ? (
+            <tbody className="divide-y divide-gray-100 bg-surface dark:divide-gray-800">
+              {filteredIdeas.length === 0 ? (
                  <tr>
                    <td colSpan="4" className="py-10 text-center text-ink-500 text-sm">No ideas saved yet. Click "Add Idea" to start brainstorming.</td>
                  </tr>
-              ) : ideas.map(idea => (
-                <tr key={idea.id} className="hover:bg-gray-50 transition-colors group">
+              ) : filteredIdeas.map(idea => (
+                <tr key={idea.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group">
                   <td className="py-4 px-6">
-                    <div className="font-semibold text-sm text-ink-900">{idea.title}</div>
+                    <div className="font-semibold text-sm text-ink-900 dark:text-white">{idea.title}</div>
                     <div className="text-[11px] text-ink-500 mt-1">{idea.pillar}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <span className="bg-gray-100 text-ink-500 px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide">
+                    <span className="bg-gray-100 dark:bg-gray-800 text-ink-700 dark:text-gray-300 px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide">
                       {idea.cluster}
                     </span>
                   </td>
                   <td className="py-4 px-6 text-center">
-                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-ink-900 font-bold text-sm border border-gray-200">
+                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-ink-900 dark:text-white font-bold text-sm border border-gray-200 dark:border-gray-700">
                       {idea.total_score}
                     </div>
                   </td>
@@ -189,7 +239,7 @@ export default function IdeaBank() {
                       <button onClick={() => moveToPipeline(idea)} className="text-xs font-bold btn-primary px-3 py-1.5 rounded-lg shadow-sm">
                         Push to Pipeline
                       </button>
-                      <button onClick={() => handleDelete(idea.id)} className="text-ink-300 hover:text-red-500 p-1.5 bg-gray-100 rounded-lg hover:bg-red-50 transition-colors">
+                      <button onClick={() => handleDelete(idea.id)} className="text-ink-300 hover:text-red-500 p-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-red-50 transition-colors">
                         <X size={14} />
                       </button>
                     </div>
